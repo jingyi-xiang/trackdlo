@@ -246,9 +246,13 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
                 }
 
                 else if (bag_file == 2) {
-                    top_left_x = 780;
-                    top_left_y = 120;
-                    bottom_right_x = 1050;
+                    // top_left_x = 780;
+                    // top_left_y = 120;
+                    // bottom_right_x = 1050;
+                    // bottom_right_y = 290;
+                    top_left_x = 720;
+                    top_left_y = 85;
+                    bottom_right_x = 1020;
                     bottom_right_y = 290;
 
                     std_msgs::Int32MultiArray corners_arr;

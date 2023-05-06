@@ -326,7 +326,9 @@ bool trackdlo::ecpd_lle (MatrixXf X_orig,
         }
         else if (kernel == 1) {
             // G = 1/(2*beta * 2*beta) * (-sqrt(2)*diff_yy_sqrt/beta).array().exp() * (2*diff_yy_sqrt.array() + sqrt(2)*beta);
-            G = 1/(2 * pow(beta, 2)) * (-2 *diff_yy_sqrt/beta).array().exp() * (2*diff_yy_sqrt.array() + sqrt(2)*beta);
+            // G = 1/(2 * pow(beta, 2)) * (-2 *diff_yy_sqrt/beta).array().exp() * (2*diff_yy_sqrt.array() + sqrt(2)*beta);
+            G = 0.995 * 1/(2 * pow(beta, 2)) * (-2 *diff_yy_sqrt/beta).array().exp() * (2*diff_yy_sqrt.array() + sqrt(2)*beta) + 0.005 * (-diff_yy_sqrt / (2 * beta * beta)).array().exp();
+            std::cout << "here" << std::endl;
         }
         else if (kernel == 2) {
             // G = 27 * 1/(72 * pow(beta, 3)) * (-sqrt(3)*diff_yy_sqrt/beta).array().exp() * (sqrt(3)*beta*beta + 3*beta*diff_yy_sqrt.array() + sqrt(3)*diff_yy.array());
@@ -358,6 +360,8 @@ bool trackdlo::ecpd_lle (MatrixXf X_orig,
         }
         else if (kernel == 1) {
             G = 1/(2*beta * 2*beta) * (-sqrt(2)*converted_node_dis/beta).array().exp() * (sqrt(2)*converted_node_dis.array() + beta);
+            // G = 0.995 * 1/(2*beta * 2*beta) * (-sqrt(2)*converted_node_dis/beta).array().exp() * (sqrt(2)*converted_node_dis.array() + beta) + 0.005 * (-converted_node_dis / (2 * beta * beta)).array().exp();
+            // std::cout << "here" << std::endl;
         }
         else if (kernel == 2) {
             G = 27 * 1/(72 * pow(beta, 3)) * (-sqrt(3)*converted_node_dis/beta).array().exp() * (sqrt(3)*beta*beta + 3*beta*converted_node_dis.array() + sqrt(3)*converted_node_dis_sq.array());
