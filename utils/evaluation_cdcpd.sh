@@ -3,7 +3,7 @@
 
 # for bag in 0
 # do
-#     for pct in 0 10 20 30 40 50
+#     for pct in 45
 #     do
 #         for trial in 0 1 2 3 4 5 6 7 8 9
 #         do
@@ -55,7 +55,7 @@
 # # image ONLY
 # for bag in 0
 # do
-#     for pct in 40
+#     for pct in 45
 #     do
 #         for trial in 0
 #         do
@@ -65,9 +65,9 @@
 #                 first_teminal=$!
 #                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && python3 src/cdcpd/ros_nodes/simple_cdcpd_node.py $bag --wait" &
 #                 second_terminal=$!
-#                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && roslaunch trackdlo evaluation.launch alg:=$alg bag_file:=$bag trial:=$trial pct_occlusion:=$pct save_images:=true save_errors:=false --wait" &
+#                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && roslaunch trackdlo evaluation.launch alg:=$alg bag_file:=$bag trial:=$trial pct_occlusion:=$pct save_images:=true --wait" &
 #                 third_terminal=$!
-#                 sleep 80
+#                 sleep 70
 #                 rosnode kill -a
 #                 killall -9 rosmaster
 #                 kill $first_terminal
@@ -78,11 +78,62 @@
 #     done
 # done
 
-for bag in 3
+# # image ONLY
+# for bag in 1 2
+# do
+#     for pct in 0
+#     do
+#         for trial in 0
+#         do
+#             for alg in cdcpd
+#             do
+#                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && roscore" &
+#                 first_teminal=$!
+#                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && python3 src/cdcpd/ros_nodes/simple_cdcpd_node.py $bag --wait" &
+#                 second_terminal=$!
+#                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && roslaunch trackdlo evaluation.launch alg:=$alg bag_file:=$bag trial:=$trial pct_occlusion:=$pct save_images:=true --wait" &
+#                 third_terminal=$!
+#                 sleep 50
+#                 rosnode kill -a
+#                 killall -9 rosmaster
+#                 kill $first_terminal
+#                 kill $second_terminal
+#                 kill $third_terminal
+#             done
+#         done
+#     done
+# done
+
+# for bag in 0
+# do
+#     for pct in 45
+#     do
+#         for trial in 1 2 3 4 5 6 7 8 9
+#         do
+#             for alg in cdcpd
+#             do
+#                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && roscore" &
+#                 first_teminal=$!
+#                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && python3 src/cdcpd/ros_nodes/simple_cdcpd_node.py $bag --wait" &
+#                 second_terminal=$!
+#                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && roslaunch trackdlo evaluation.launch alg:=$alg bag_file:=$bag trial:=$trial pct_occlusion:=$pct --wait" &
+#                 third_terminal=$!
+#                 sleep 70
+#                 rosnode kill -a
+#                 killall -9 rosmaster
+#                 kill $first_terminal
+#                 kill $second_terminal
+#                 kill $third_terminal
+#             done
+#         done
+#     done
+# done
+
+for bag in 2
 do
     for pct in 0
     do
-        for trial in 0
+        for trial in 1 2 3 4 5 6 7 8 9
         do
             for alg in cdcpd
             do
@@ -90,7 +141,7 @@ do
                 first_teminal=$!
                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && python3 src/cdcpd/ros_nodes/simple_cdcpd_node.py $bag --wait" &
                 second_terminal=$!
-                terminator -e "cd ~/catkin_ws && source devel/setup.bash && roslaunch trackdlo evaluation.launch alg:=$alg bag_file:=$bag trial:=$trial pct_occlusion:=$pct save_images:=true bag_rate:=0.5 --wait" &
+                terminator -e "cd ~/catkin_ws && source devel/setup.bash && roslaunch trackdlo evaluation.launch alg:=$alg bag_file:=$bag trial:=$trial pct_occlusion:=$pct --wait" &
                 third_terminal=$!
                 sleep 50
                 rosnode kill -a
@@ -102,3 +153,28 @@ do
         done
     done
 done
+
+# for bag in 3
+# do
+#     for pct in 0
+#     do
+#         for trial in 0
+#         do
+#             for alg in cdcpd
+#             do
+#                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && roscore" &
+#                 first_teminal=$!
+#                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && python3 src/cdcpd/ros_nodes/simple_cdcpd_node.py $bag --wait" &
+#                 second_terminal=$!
+#                 terminator -e "cd ~/catkin_ws && source devel/setup.bash && roslaunch trackdlo evaluation.launch alg:=$alg bag_file:=$bag trial:=$trial pct_occlusion:=$pct save_images:=true bag_rate:=0.5 --wait" &
+#                 third_terminal=$!
+#                 sleep 50
+#                 rosnode kill -a
+#                 killall -9 rosmaster
+#                 kill $first_terminal
+#                 kill $second_terminal
+#                 kill $third_terminal
+#             done
+#         done
+#     done
+# done
