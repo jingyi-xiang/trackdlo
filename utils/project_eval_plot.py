@@ -8,6 +8,7 @@ from labellines import labelLines
 plt.rcParams.update({'font.size': 15})
 titleSize = 22
 labelSize = 18
+figsize = (10, 5)
 
 algorithms = ['trackdlo', 'bcpd']
 bags = ['stationary','perpendicular_motion', 'parallel_motion']
@@ -19,9 +20,9 @@ pcts = [0, 10, 20, 30, 40, 50]
 
 # bags = ['stationary','perpendicular_motion']
 algorithms_plot = {'trackdlo': 'TrackDLO',
-                    'bcpd': 'BCPD'}
-colors = ['red', 'orange', 'deepskyblue', 'b', 'midnightblue']
-markers = ['o','^','X','s', 'v']
+                    'bcpd': 'TrackDLO\n+ GBCPD'}
+colors = ['red', 'midnightblue']
+markers = ['o', 'v']
 
 ###################### PLOT TIME VS. FRAME ERROR ######################
 window_size = 10
@@ -31,7 +32,7 @@ dir = join(dirname(dirname(abspath(__file__))), "data")
 for n, bag in enumerate(bags):
     if bag=='stationary':
         for pct in [45]:
-            plt.figure(figsize=(8, 5))
+            plt.figure(figsize=figsize)
             ax = plt.gca()
             for i, algorithm in enumerate(algorithms):
                 data = []
@@ -66,17 +67,24 @@ for n, bag in enumerate(bags):
             plt.xlim(0, 26)
             plt.axvspan(5, 26, facecolor='darkslateblue', alpha=0.2)
 
-
             plt.ylim(0, 12)
             plt.tight_layout()
-            # plt.grid()
-            plt.legend()
-            plt.savefig(f'{dir}/eval_frame_error_{bag}.png')
+            
+            #get handles and labels
+            handles, labels = plt.gca().get_legend_handles_labels()
+
+            #specify order of items in legend
+            order = [1, 0]
+
+            #add legend to plot
+            plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order])
+
+            plt.savefig(f'{dir}/eval_frame_error_{bag}_zoomed_in.png')
             plt.close()
 
     else:
         for pct in pcts[:1]:
-            plt.figure(figsize=(8, 5))
+            plt.figure(figsize=figsize)
             ax = plt.gca()
             for i, algorithm in enumerate(algorithms):
                 data = []
@@ -117,11 +125,19 @@ for n, bag in enumerate(bags):
                 plt.axvspan(3.5, 10, facecolor='darkslateblue', alpha=0.2)
                 plt.axvspan(10, 16, facecolor='slategray', alpha=0.2)
 
-            plt.ylim(0, 12)
+            plt.ylim(0, 6)
             plt.tight_layout()
-            # plt.grid()
-            plt.legend()
-            plt.savefig(f'{dir}/eval_frame_error_{bag}.png')
+            
+            #get handles and labels
+            handles, labels = plt.gca().get_legend_handles_labels()
+
+            #specify order of items in legend
+            order = [1, 0]
+
+            #add legend to plot
+            plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order])
+
+            plt.savefig(f'{dir}/eval_frame_error_{bag}_zoomed_in.png')
             plt.close()
 
 # ###################### PLOT PCT OCCLUSION VS. FINAL FRAME ERROR ######################
