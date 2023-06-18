@@ -28,6 +28,7 @@ MatrixXd proj_matrix(3, 4);
 double total_len = 0;
 
 bool multi_color_dlo;
+bool gltp;
 double visibility_threshold;
 int dlo_pixel_width;
 double beta;
@@ -211,7 +212,7 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
                     occlusion_corner_j_2 = j;
                 }
 
-                double depth_threshold = 0.4 * 1000;  // millimeters
+                double depth_threshold = 0.35 * 1000;  // millimeters
                 if (mask.at<uchar>(i, j) != 0 && cur_depth.at<uint16_t>(i, j) > depth_threshold) {
                     // point cloud from image pixel coordinates and depth value
                     pcl::PointXYZRGB point;
@@ -346,12 +347,17 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
         std::cout << "visible nodes extended: ";
         print_1d_vector(visible_nodes_extended);
         
-        tracker.tracking_step(X, visible_nodes, visible_nodes_extended, proj_matrix, mask.rows, mask.cols);
-        // tracker.ecpd_lle(X, Y, sigma2, 3, 1, 1, 0.1, 50, 0.00001, true, true, true, false, {}, 0, 1);
-    
-        Y = tracker.get_tracking_result();
-        guide_nodes = tracker.get_guide_nodes();
-        priors = tracker.get_correspondence_pairs();
+        if (!gltp) {
+            tracker.tracking_step(X, visible_nodes, visible_nodes_extended, proj_matrix, mask.rows, mask.cols);
+            // tracker.ecpd_lle(X, Y, sigma2, 3, 1, 1, 0.1, 50, 0.00001, true, true, true, false, {}, 0, 1);
+        
+            Y = tracker.get_tracking_result();
+            guide_nodes = tracker.get_guide_nodes();
+            priors = tracker.get_correspondence_pairs();
+        }
+        else {
+            tracker.cpd_lle(X, Y, sigma2, 1, 1, 1, 0.05, 50, 0.00001, true, false, true);
+        }
 
         // log time
         time_diff = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - cur_time).count() / 1000.0;
@@ -413,9 +419,16 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
         pcl_conversions::moveFromPCL(cur_pc_pointcloud2, output);
 
         // publish the results as a marker array
-        visualization_msgs::MarkerArray results = MatrixXd2MarkerArray(Y, "camera_color_optical_frame", "node_results", {1.0, 150.0/255.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0}, 0.01, 0.005, visible_nodes, {1.0, 0.0, 0.0, 1.0}, {1.0, 0.0, 0.0, 1.0});
-        visualization_msgs::MarkerArray guide_nodes_results = MatrixXd2MarkerArray(guide_nodes, "camera_color_optical_frame", "guide_node_results", {0.0, 0.0, 0.0, 0.5}, {0.0, 0.0, 1.0, 0.5});
+        // visualization_msgs::MarkerArray results = MatrixXd2MarkerArray(Y, "camera_color_optical_frame", "node_results", {1.0, 150.0/255.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0}, 0.01, 0.005, visible_nodes, {1.0, 0.0, 0.0, 1.0}, {1.0, 0.0, 0.0, 1.0});
+        visualization_msgs::MarkerArray results = MatrixXd2MarkerArray(Y, "camera_color_optical_frame", "node_results", {1.0, 150.0/255.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0});
+        // visualization_msgs::MarkerArray guide_nodes_results = MatrixXd2MarkerArray(guide_nodes, "camera_color_optical_frame", "guide_node_results", {0.0, 0.0, 0.0, 0.5}, {0.0, 0.0, 1.0, 0.5});
         visualization_msgs::MarkerArray corr_priors_results = MatrixXd2MarkerArray(priors, "camera_color_optical_frame", "corr_prior_results", {0.0, 0.0, 0.0, 0.5}, {1.0, 0.0, 0.0, 0.5});
+
+        // temp test
+        MatrixXd cylinder(2, 3);
+        cylinder << 0.175, 0.01, 0.51,
+                    0.175, 0.01, 0.41;
+        visualization_msgs::MarkerArray guide_nodes_results = MatrixXd2MarkerArray(cylinder, "camera_color_optical_frame", "guide_node_results", {0.0, 0.0, 0.0, 0.5}, {0.0, 0.0, 1.0, 0.4}, 0.0, 0.075);
 
         // convert to pointcloud2 for eval
         pcl::PointCloud<pcl::PointXYZ> trackdlo_pc;
@@ -486,6 +499,7 @@ int main(int argc, char **argv) {
     nh.getParam("/trackdlo/kernel", kernel); 
 
     nh.getParam("/trackdlo/multi_color_dlo", multi_color_dlo);
+    nh.getParam("/trackdlo/gltp", gltp);
     nh.getParam("/trackdlo/visibility_threshold", visibility_threshold);
     nh.getParam("/trackdlo/dlo_pixel_width", dlo_pixel_width);
     nh.getParam("/trackdlo/downsample_leaf_size", downsample_leaf_size);
@@ -537,10 +551,10 @@ int main(int argc, char **argv) {
     camera_info_sub = nh.subscribe(camera_info_topic, 1, update_camera_info);
 
     image_transport::Publisher mask_pub = it.advertise("/trackdlo/mask", pub_queue_size);
-    image_transport::Publisher tracking_img_pub = it.advertise("/trackdlo/results_img", pub_queue_size);
-    pc_pub = nh.advertise<sensor_msgs::PointCloud2>("/trackdlo/filtered_pointcloud", pub_queue_size);
-    results_pub = nh.advertise<visualization_msgs::MarkerArray>("/trackdlo/results_marker", pub_queue_size);
-    guide_nodes_pub = nh.advertise<visualization_msgs::MarkerArray>("/trackdlo/guide_nodes", pub_queue_size);
+    image_transport::Publisher tracking_img_pub = it.advertise("/results_img", pub_queue_size);
+    pc_pub = nh.advertise<sensor_msgs::PointCloud2>("/filtered_pointcloud", pub_queue_size);
+    results_pub = nh.advertise<visualization_msgs::MarkerArray>("/results_marker", pub_queue_size);
+    guide_nodes_pub = nh.advertise<visualization_msgs::MarkerArray>("/guide_nodes", pub_queue_size);
     corr_priors_pub = nh.advertise<visualization_msgs::MarkerArray>("/trackdlo/corr_priors", pub_queue_size);
 
     // trackdlo point cloud topic

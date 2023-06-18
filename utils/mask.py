@@ -18,19 +18,24 @@ def callback (rgb, pc):
     # color thresholding
 
     # rope blue
-    # lower = (100, 120, 30)
-    # upper = (130, 255, 255)
-    # mask = cv2.inRange(hsv_image, lower, upper)
-
-    # latex blue
-    lower = (100, 230, 60)
+    lower = (90, 90, 40)
     upper = (130, 255, 255)
     mask = cv2.inRange(hsv_image, lower, upper)
+
+    # latex blue
+    # lower = (100, 230, 60)
+    # upper = (130, 255, 255)
+    # mask = cv2.inRange(hsv_image, lower, upper)
 
     # green
     # lower = (60, 130, 60)
     # upper = (95, 255, 255)
     # mask_green = cv2.inRange(hsv_image, lower, upper)
+
+    # # cdcpd2 rope red
+    # lower = (110, 60, 50)
+    # upper = (255, 255, 255)
+    # mask = cv2.inRange(hsv_image, lower, upper)
 
     # mask = cv2.bitwise_or(mask_blue, mask_green)
     mask = cv2.cvtColor(mask.copy(), cv2.COLOR_GRAY2BGR)
@@ -55,7 +60,7 @@ if __name__=='__main__':
                 PointField('z', 8, PointField.FLOAT32, 1),
                 PointField('rgba', 12, PointField.UINT32, 1)]
     pc_pub = rospy.Publisher ('/trackdlo/filtered_pointcloud', PointCloud2, queue_size=10)
-    mask_img_pub = rospy.Publisher('/trackdlo/results_img', Image, queue_size=10)
+    mask_img_pub = rospy.Publisher('/results_img', Image, queue_size=10)
 
     ts = message_filters.TimeSynchronizer([rgb_sub, pc_sub], 10)
     ts.registerCallback(callback)
