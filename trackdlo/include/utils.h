@@ -49,6 +49,12 @@ visualization_msgs::MarkerArray MatrixXd2MarkerArray (std::vector<MatrixXd> Y,
                                                       std::vector<float> occluded_node_color = {},
                                                       std::vector<float> occluded_line_color = {});
 
+visualization_msgs::MarkerArray pub_obstacle (MatrixXd Y,
+                                              std::string marker_frame, 
+                                              std::string marker_ns, 
+                                              std::vector<float> color, 
+                                              double scale);
+
 MatrixXd cross_product (MatrixXd vec1, MatrixXd vec2);
 double dot_product (MatrixXd vec1, MatrixXd vec2);
 

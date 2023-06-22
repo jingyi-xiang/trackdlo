@@ -56,6 +56,9 @@ std::vector<int> lower;
 
 trackdlo tracker;
 
+// temp
+std::chrono::high_resolution_clock::time_point start_time;
+
 void update_opencv_mask (const sensor_msgs::ImageConstPtr& opencv_mask_msg) {
     occlusion_mask = cv_bridge::toCvShare(opencv_mask_msg, "bgr8")->image;
     if (!occlusion_mask.empty()) {
@@ -75,6 +78,7 @@ void update_init_nodes (const sensor_msgs::PointCloud2ConstPtr& pc_msg) {
 }
 
 void update_camera_info (const sensor_msgs::CameraInfoConstPtr& cam_msg) {
+    start_time = std::chrono::high_resolution_clock::now();
     auto P = cam_msg->P;
     for (int i = 0; i < P.size(); i ++) {
         proj_matrix(i/4, i%4) = P[i];
@@ -462,8 +466,37 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
         // publish the results as a marker array
         // visualization_msgs::MarkerArray results = MatrixXd2MarkerArray(Y, result_frame_id, "node_results", {1.0, 150.0/255.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0}, 0.01, 0.005, visible_nodes, {1.0, 0.0, 0.0, 1.0}, {1.0, 0.0, 0.0, 1.0});
         visualization_msgs::MarkerArray results = MatrixXd2MarkerArray(Y, result_frame_id, "node_results", {1.0, 150.0/255.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0}, 0.01, 0.005);
-        visualization_msgs::MarkerArray guide_nodes_results = MatrixXd2MarkerArray(guide_nodes, result_frame_id, "guide_node_results", {0.0, 0.0, 0.0, 0.5}, {0.0, 0.0, 1.0, 0.5});
+        // visualization_msgs::MarkerArray guide_nodes_results = MatrixXd2MarkerArray(guide_nodes, result_frame_id, "guide_node_results", {0.0, 0.0, 0.0, 0.5}, {0.0, 0.0, 1.0, 0.5});
         visualization_msgs::MarkerArray corr_priors_results = MatrixXd2MarkerArray(priors, result_frame_id, "corr_prior_results", {0.0, 0.0, 0.0, 0.5}, {1.0, 0.0, 0.0, 0.5});
+
+        std::chrono::high_resolution_clock::time_point cur_time_obs = std::chrono::high_resolution_clock::now();
+        time_diff = std::chrono::duration_cast<std::chrono::microseconds>(cur_time_obs - start_time).count() / 1000000.0;
+        
+        visualization_msgs::MarkerArray guide_nodes_results;
+        if (time_diff < 5) {
+            MatrixXd obs(2, 3);
+            obs << -0.11, -0.005, 0.47,
+                   -0.11, -0.005, 0.51;
+            guide_nodes_results = pub_obstacle(obs, result_frame_id, "obs", {1.0, 0.0, 0.0, 0.4}, 0.11);
+        }
+        else if (time_diff < 9) {
+            MatrixXd obs(4, 3);
+            double cur_x = 0.37 - 0.115*(time_diff-5)/4;
+            std::cout << cur_x << std::endl;
+            obs << -0.11, -0.005, 0.47,
+                   -0.11, -0.005, 0.51,
+                   cur_x, 0.0, 0.47,
+                   cur_x, 0.0, 0.51;
+            guide_nodes_results = pub_obstacle(obs, result_frame_id, "obs", {1.0, 0.0, 0.0, 0.4}, 0.11);
+        }
+        else {
+            MatrixXd obs(4, 3);
+            obs << -0.11, -0.005, 0.47,
+                   -0.11, -0.005, 0.51,
+                   0.255, 0.0, 0.47,
+                   0.255, 0.0, 0.51;
+            guide_nodes_results = pub_obstacle(obs, result_frame_id, "obs", {1.0, 0.0, 0.0, 0.4}, 0.11);
+        }
 
         // convert to pointcloud2 for eval
         pcl::PointCloud<pcl::PointXYZ> trackdlo_pc;

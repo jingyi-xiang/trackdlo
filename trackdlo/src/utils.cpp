@@ -309,10 +309,10 @@ visualization_msgs::MarkerArray MatrixXd2MarkerArray (MatrixXd Y,
         visualization_msgs::Marker cur_line_result = visualization_msgs::Marker();
 
         // add header
-        cur_line_result.header.frame_id = "camera_color_optical_frame";
+        cur_line_result.header.frame_id = marker_frame;
         cur_line_result.type = visualization_msgs::Marker::CYLINDER;
         cur_line_result.action = visualization_msgs::Marker::ADD;
-        cur_line_result.ns = "line_results" + std::to_string(i);
+        cur_line_result.ns = marker_ns + "_line_" + std::to_string(i);
         cur_line_result.id = i;
 
         // add position
@@ -381,7 +381,7 @@ visualization_msgs::MarkerArray MatrixXd2MarkerArray (std::vector<MatrixXd> Y,
         // cur_node_result.header.stamp = ros::Time::now();
         cur_node_result.type = visualization_msgs::Marker::SPHERE;
         cur_node_result.action = visualization_msgs::Marker::ADD;
-        cur_node_result.ns = marker_ns + std::to_string(i);
+        cur_node_result.ns = marker_ns + "_node_" + std::to_string(i);
         cur_node_result.id = i;
 
         // add position
@@ -427,10 +427,10 @@ visualization_msgs::MarkerArray MatrixXd2MarkerArray (std::vector<MatrixXd> Y,
         visualization_msgs::Marker cur_line_result = visualization_msgs::Marker();
 
         // add header
-        cur_line_result.header.frame_id = "camera_color_optical_frame";
+        cur_line_result.header.frame_id = marker_frame;
         cur_line_result.type = visualization_msgs::Marker::CYLINDER;
         cur_line_result.action = visualization_msgs::Marker::ADD;
-        cur_line_result.ns = "line_results" + std::to_string(i);
+        cur_line_result.ns = marker_ns + "_line_" + std::to_string(i);
         cur_line_result.id = i;
 
         // add position
@@ -469,6 +469,61 @@ visualization_msgs::MarkerArray MatrixXd2MarkerArray (std::vector<MatrixXd> Y,
         }
 
         results.markers.push_back(cur_line_result);
+    }
+
+    return results;
+}
+
+// overload function
+visualization_msgs::MarkerArray pub_obstacle (MatrixXd Y,
+                                              std::string marker_frame, 
+                                              std::string marker_ns, 
+                                              std::vector<float> color, 
+                                              double scale) {
+    // publish the results as a marker array
+    visualization_msgs::MarkerArray results = visualization_msgs::MarkerArray();
+
+    bool last_node_visible = true;
+    int dim = 3;
+
+    for (int i = 1; i < Y.rows(); i+=2) {
+        visualization_msgs::Marker cur_obs_result = visualization_msgs::Marker();
+
+        // add header
+        cur_obs_result.header.frame_id = marker_frame;
+        cur_obs_result.type = visualization_msgs::Marker::CUBE;
+        cur_obs_result.action = visualization_msgs::Marker::ADD;
+        cur_obs_result.ns = marker_ns + std::to_string(i);
+        cur_obs_result.id = i;
+
+        // add position
+        cur_obs_result.pose.position.x = (Y(i, dim-3) + Y(i-1, dim-3)) / 2.0;
+        cur_obs_result.pose.position.y = (Y(i, dim-2) + Y(i-1, dim-2)) / 2.0;
+        cur_obs_result.pose.position.z = (Y(i, dim-1) + Y(i-1, dim-1)) / 2.0;
+
+        // add orientation
+        Eigen::Quaternionf q;
+        Eigen::Vector3f vec1(0.0, 0.0, 1.0);
+        Eigen::Vector3f vec2(Y(i, dim-3) - Y(i-1, dim-3), Y(i, dim-2) - Y(i-1, dim-2), Y(i, dim-1) - Y(i-1, dim-1));
+        q.setFromTwoVectors(vec1, vec2);
+
+        cur_obs_result.pose.orientation.w = q.w();
+        cur_obs_result.pose.orientation.x = q.x();
+        cur_obs_result.pose.orientation.y = q.y();
+        cur_obs_result.pose.orientation.z = q.z();
+
+        // set scale
+        cur_obs_result.scale.x = scale;
+        cur_obs_result.scale.y = scale;
+        cur_obs_result.scale.z = sqrt(pow(Y(i, dim-3) - Y(i-1, dim-3), 2) + pow(Y(i, dim-2) - Y(i-1, dim-2), 2) + pow(Y(i, dim-1) - Y(i-1, dim-1), 2));
+
+        // set color
+        cur_obs_result.color.r = color[0];
+        cur_obs_result.color.g = color[1];
+        cur_obs_result.color.b = color[2];
+        cur_obs_result.color.a = color[3];
+
+        results.markers.push_back(cur_obs_result);
     }
 
     return results;
