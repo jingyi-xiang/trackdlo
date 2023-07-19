@@ -44,6 +44,8 @@ bool use_geodesic;
 bool use_prev_sigma2;
 int kernel;
 double downsample_leaf_size;
+double dlo_diameter;
+bool clamp;
 
 std::string camera_info_topic;
 std::string rgb_topic;
@@ -370,6 +372,9 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
             }
         }
         visible_nodes_extended.push_back(visible_nodes[visible_nodes.size()-1]);
+
+        // store Y_0 for post processing
+        MatrixXd Y_0 = Y.replicate(1, 1);
         
         if (!gltp) {
             tracker.tracking_step(X_pruned, visible_nodes, visible_nodes_extended, proj_matrix, mask.rows, mask.cols);
@@ -380,6 +385,10 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
         else {
             tracker.cpd_lle(X_pruned, Y, sigma2, 1, 1, 1, mu, 50, tol, true, false, true);
         }
+
+        // post_processing
+        MatrixXd Y_processed = post_processing(Y_0, Y, dlo_diameter, Y.rows(), clamp);
+        Y = Y_processed.replicate(1, 1);
 
         // log time
         time_diff = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - cur_time).count() / 1000.0;
@@ -544,6 +553,8 @@ int main(int argc, char **argv) {
     nh.getParam("/trackdlo/gltp", gltp);
     nh.getParam("/trackdlo/visibility_threshold", visibility_threshold);
     nh.getParam("/trackdlo/dlo_pixel_width", dlo_pixel_width);
+    nh.getParam("/trackdlo/dlo_diameter", dlo_diameter);
+    nh.getParam("/trackdlo/clamp", clamp);
     nh.getParam("/trackdlo/downsample_leaf_size", downsample_leaf_size);
 
     nh.getParam("/trackdlo/camera_info_topic", camera_info_topic);
