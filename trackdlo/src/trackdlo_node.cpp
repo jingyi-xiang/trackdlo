@@ -386,6 +386,35 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
             tracker.cpd_lle(X_pruned, Y, sigma2, 1, 1, 1, mu, 50, tol, true, false, true);
         }
 
+        // // ========== debug ==========
+        // // print out previous node positions in np array format
+        // std::cout << "===== Y_0 =====" << std::endl;
+        // for (int i = 0; i < Y_0.rows(); i ++) {
+        //     if (i == 0) {
+        //         std::cout << "[[" << Y_0(i, 0) << ", " << Y_0(i, 1) << ", " << Y_0(i, 2) << "], \\" << std::endl;
+        //     }
+        //     else if (i == Y_0.rows()-1) {
+        //         std::cout << " [" << Y_0(i, 0) << ", " << Y_0(i, 1) << ", " << Y_0(i, 2) << "]]" << std::endl;
+        //     }
+        //     else {
+        //         std::cout << " [" << Y_0(i, 0) << ", " << Y_0(i, 1) << ", " << Y_0(i, 2) << "], \\" << std::endl;
+        //     }
+        // }
+        // // print out current node positions in np array format
+        // std::cout << "===== Y before optimization =====" << std::endl;
+        // for (int i = 0; i < Y.rows(); i ++) {
+        //     if (i == 0) {
+        //         std::cout << "[[" << Y(i, 0) << ", " << Y(i, 1) << ", " << Y(i, 2) << "], \\" << std::endl;
+        //     }
+        //     else if (i == Y.rows()-1) {
+        //         std::cout << " [" << Y(i, 0) << ", " << Y(i, 1) << ", " << Y(i, 2) << "]]" << std::endl;
+        //     }
+        //     else {
+        //         std::cout << " [" << Y(i, 0) << ", " << Y(i, 1) << ", " << Y(i, 2) << "], \\" << std::endl;
+        //     }
+        // }
+        // // ========== debug ==========
+
         // post_processing
         MatrixXd Y_processed = post_processing(Y_0, Y, dlo_diameter, Y.rows(), clamp);
         Y = Y_processed.replicate(1, 1);
