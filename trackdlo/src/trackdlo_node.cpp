@@ -45,6 +45,7 @@ bool use_prev_sigma2;
 int kernel;
 double downsample_leaf_size;
 double dlo_diameter;
+double check_distance;
 bool clamp;
 
 std::string camera_info_topic;
@@ -416,7 +417,7 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
         // // ========== debug ==========
 
         // post_processing
-        MatrixXd Y_processed = post_processing(Y_0, Y, dlo_diameter, Y.rows(), clamp);
+        MatrixXd Y_processed = post_processing(Y_0, Y, check_distance, dlo_diameter, Y.rows(), clamp);
         Y = Y_processed.replicate(1, 1);
 
         // log time
@@ -583,6 +584,7 @@ int main(int argc, char **argv) {
     nh.getParam("/trackdlo/visibility_threshold", visibility_threshold);
     nh.getParam("/trackdlo/dlo_pixel_width", dlo_pixel_width);
     nh.getParam("/trackdlo/dlo_diameter", dlo_diameter);
+    nh.getParam("/trackdlo/check_distance", check_distance);
     nh.getParam("/trackdlo/clamp", clamp);
     nh.getParam("/trackdlo/downsample_leaf_size", downsample_leaf_size);
 

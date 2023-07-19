@@ -351,7 +351,7 @@ static GRBEnv& getGRBEnv () {
     return env;
 }
 
-MatrixXd post_processing (MatrixXd Y_0, MatrixXd Y, double dlo_diameter, int nodes_per_dlo, bool clamp) {
+MatrixXd post_processing (MatrixXd Y_0, MatrixXd Y, double check_distance, double dlo_diameter, int nodes_per_dlo, bool clamp) {
     MatrixXd Y_processed = MatrixXd::Zero(Y.rows(), Y.cols());
     int num_of_dlos = Y.rows() / nodes_per_dlo;
 
@@ -385,7 +385,7 @@ MatrixXd post_processing (MatrixXd Y_0, MatrixXd Y, double dlo_diameter, int nod
             }
 
             auto[temp1, temp2, cur_shortest_dist] = shortest_dist_between_lines(Y.row(i), Y.row(i+1), Y.row(j), Y.row(j+1), true);
-            if (cur_shortest_dist >= dlo_diameter) {
+            if (cur_shortest_dist >= check_distance) {
                 continue;
             }
 

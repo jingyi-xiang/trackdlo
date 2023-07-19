@@ -31,6 +31,10 @@
         <param name="hsv_threshold_upper_limit" type="string" value="$(arg hsv_threshold_upper_limit)" />
         <param name="hsv_threshold_lower_limit" type="string" value="$(arg hsv_threshold_lower_limit)" />
 
+        <param name="dlo_diameter" value="0.01" />
+        <param name="check_distance" value="0.02" />
+        <param name="clamp" type="bool" value="true" />
+
         <!-- beta and lambda: MCT weights. the larger they are, the more rigid the object becomes -->
         <param name="beta" value="1" if="$(eval arg('kernel') == 0)"/>
         <param name="lambda" value="50000" if="$(eval arg('kernel') == 0)"/>
@@ -78,8 +82,6 @@
         <param name="multi_color_dlo" type="bool" value="$(arg multi_color_dlo)" />
         <param name="visibility_threshold" type="double" value="0.008" />
         <param name="dlo_pixel_width" value="30" />
-        <param name="dlo_diameter" value="0.01" />
-        <param name="clamp" type="bool" value="true" />
         <param name="gltp" type="bool" value="$(arg gltp)" />
     </node>
 
