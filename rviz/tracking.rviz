@@ -51,7 +51,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /camera/color/image_raw
+      Image Topic: /trackdlo/results_img
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -63,7 +63,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /trackdlo/results_img
+      Image Topic: /camera/color/image_raw
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -101,7 +101,22 @@ Visualization Manager:
         node_results_line_28: true
         node_results_line_29: true
         node_results_line_3: true
+        node_results_line_30: true
+        node_results_line_31: true
+        node_results_line_32: true
+        node_results_line_33: true
+        node_results_line_34: true
+        node_results_line_35: true
+        node_results_line_36: true
+        node_results_line_37: true
+        node_results_line_38: true
+        node_results_line_39: true
         node_results_line_4: true
+        node_results_line_40: true
+        node_results_line_41: true
+        node_results_line_42: true
+        node_results_line_43: true
+        node_results_line_44: true
         node_results_line_5: true
         node_results_line_6: true
         node_results_line_7: true
@@ -131,7 +146,22 @@ Visualization Manager:
         node_results_node_28: true
         node_results_node_29: true
         node_results_node_3: true
+        node_results_node_30: true
+        node_results_node_31: true
+        node_results_node_32: true
+        node_results_node_33: true
+        node_results_node_34: true
+        node_results_node_35: true
+        node_results_node_36: true
+        node_results_node_37: true
+        node_results_node_38: true
+        node_results_node_39: true
         node_results_node_4: true
+        node_results_node_40: true
+        node_results_node_41: true
+        node_results_node_42: true
+        node_results_node_43: true
+        node_results_node_44: true
         node_results_node_5: true
         node_results_node_6: true
         node_results_node_7: true
@@ -203,6 +233,34 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Min Color: 0; 0; 0
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic: /trackdlo/self_occluded_pc
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 85; 87; 83
@@ -231,7 +289,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.4529026448726654
+      Distance: 0.46876779198646545
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -239,17 +297,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.5150726437568665
-        Y: -0.010364384390413761
-        Z: 0.0010990879964083433
+        X: 0.5357120633125305
+        Y: 0.0800638198852539
+        Z: -0.021995484828948975
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5547962188720703
+      Pitch: 0.5097972750663757
       Target Frame: <Fixed Frame>
-      Yaw: 3.154034376144409
+      Yaw: 3.0008602142333984
     Saved: ~
 Window Geometry:
   Displays:
