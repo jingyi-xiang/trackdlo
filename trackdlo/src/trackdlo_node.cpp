@@ -60,6 +60,7 @@ std::vector<int> upper;
 std::vector<int> lower;
 
 trackdlo tracker;
+std::vector<int> last_valid_visible_nodes = {};
 
 void update_opencv_mask (const sensor_msgs::ImageConstPtr& opencv_mask_msg) {
     occlusion_mask = cv_bridge::toCvShare(opencv_mask_msg, "bgr8")->image;
@@ -150,6 +151,10 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
             tracker.initialize_nodes(init_nodes);
             tracker.initialize_geodesic_coord(converted_node_coord);
             Y = init_nodes.replicate(1, 1);
+
+            for (int i = 0; i < Y.rows(); i ++) {
+                last_valid_visible_nodes.push_back(i);
+            }
 
             initialized = true;
         }
@@ -289,7 +294,7 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
                     // this is necessary because exp(-dist/sigma2) can become too small to represent in MatrixXd
                     // if a point x_n in X is too far away from all nodes, all entries in row n of P will be zero,
                     // even if they technically aren't all zeros
-                    if (shortest_pt_node_dists[n] < 0.05) {
+                    if (shortest_pt_node_dists[n] < 0.1) {
                         X_temp.row(valid_pt_counter) = X.row(n);
                         valid_pt_counter += 1;
                     }
@@ -332,6 +337,11 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
             int col_2 = static_cast<int>(image_coords_mask(idx+1, 0)/image_coords_mask(idx+1, 2));
             int row_2 = static_cast<int>(image_coords_mask(idx+1, 1)/image_coords_mask(idx+1, 2));
 
+            if (col_1 < 0 || col_1 >= mask.cols || row_1 < 0 || row_1 >= mask.rows || col_2 < 0 || col_2 >= mask.cols || row_2 < 0 || row_2 >= mask.rows) {
+                ROS_ERROR("Object out of frame!");
+                ros::shutdown();
+            }
+
             // only add to visible nodes if did not overlap with existing edges
             if (projected_edges.at<uchar>(row_1, col_1) == 0) {
                 if (shortest_node_pt_dists[idx] <= visibility_threshold) {
@@ -367,24 +377,34 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
             }
         }
 
-        print_1d_vector(self_occluded_nodes);
-
-        // sort visible nodes to preserve the original connectivity
-        std::sort(visible_nodes.begin(), visible_nodes.end());
-
-        // minor mid-section occlusion is usually fine
-        // extend visible nodes so that gaps as small as 2 to 3 nodes are filled
         std::vector<int> visible_nodes_extended = {};
-        for (int i = 0; i < visible_nodes.size()-1; i ++) {
-            visible_nodes_extended.push_back(visible_nodes[i]);
-            // extend two nodes
-            if (visible_nodes[i+1] - visible_nodes[i] <= 3) {
-                for (int j = 1; j < visible_nodes[i+1] - visible_nodes[i]; j ++) {
-                    visible_nodes_extended.push_back(visible_nodes[i] + j);
+        if (visible_nodes.size() < Y.rows()/2) {
+            visible_nodes = {};
+            visible_nodes = last_valid_visible_nodes;
+            visible_nodes_extended = last_valid_visible_nodes;
+        }
+        else {
+            // sort visible nodes to preserve the original connectivity
+            std::sort(visible_nodes.begin(), visible_nodes.end());
+
+            // minor mid-section occlusion is usually fine
+            // extend visible nodes so that gaps as small as 2 to 3 nodes are filled
+            for (int i = 0; i < visible_nodes.size()-1; i ++) {
+                visible_nodes_extended.push_back(visible_nodes[i]);
+                // extend two nodes
+                if (visible_nodes[i+1] - visible_nodes[i] <= 3) {
+                    for (int j = 1; j < visible_nodes[i+1] - visible_nodes[i]; j ++) {
+                        visible_nodes_extended.push_back(visible_nodes[i] + j);
+                    }
                 }
             }
+            visible_nodes_extended.push_back(visible_nodes[visible_nodes.size()-1]);
+
+            if (visible_nodes.size() >= Y.rows()/2) {
+                last_valid_visible_nodes = {};
+                last_valid_visible_nodes = visible_nodes_extended;
+            }
         }
-        visible_nodes_extended.push_back(visible_nodes[visible_nodes.size()-1]);
 
         // store Y_0 for post processing
         MatrixXd Y_0 = Y.replicate(1, 1);
