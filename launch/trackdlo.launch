@@ -65,7 +65,7 @@
         <param name="tol" value="0.0002" />
 
         <!-- k_vis: the strength of visibility information's effect on membership probability computation -->
-        <param name="k_vis" value="50" />
+        <param name="k_vis" value="100" />
 
         <!-- set to false in the registration step because we did not have space in the paper to discuss LLE -->
         <param name="include_lle" value="false" />
@@ -81,7 +81,7 @@
         <param name="kernel" value="$(arg kernel)" />
         <param name="downsample_leaf_size" value="0.008" />
         <param name="multi_color_dlo" type="bool" value="$(arg multi_color_dlo)" />
-        <param name="visibility_threshold" type="double" value="0.006" />
+        <param name="visibility_threshold" type="double" value="0.008" />
         <param name="dlo_pixel_width" value="30" />
         <param name="gltp" type="bool" value="$(arg gltp)" />
     </node>
