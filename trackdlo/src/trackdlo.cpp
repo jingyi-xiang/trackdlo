@@ -961,11 +961,17 @@ void trackdlo::tracking_step (MatrixXd X,
         guide_nodes_ = Y_.replicate(1, 1);
     }
 
+    MatrixXd prev_guide_nodes = guide_nodes_.replicate(1, 1);
+
     // determine DLO state: heading visible, tail visible, both visible, or both occluded
     // priors_vec should be the final output; priors_vec[i] = {index, x, y, z}
     double sigma2_pre_proc = sigma2_;
     cpd_lle(X, guide_nodes_, sigma2_pre_proc, 3, 1, lle_weight_, mu_, 50, tol_, true, true, true, false, {}, 0, 1);
     // cpd_lle(X, guide_nodes_, sigma2_pre_proc, 1, 1, 1, mu_, 50, tol_, true, true, true);
+
+    // test
+    MatrixXd guide_nodes_processed = post_processing(prev_guide_nodes, guide_nodes_, 0.015, 0.01, guide_nodes_.rows(), true);
+    guide_nodes_ = guide_nodes_processed.replicate(1, 1);
 
     if (visible_nodes_extended.size() == Y_.rows()) {
         if (visible_nodes.size() == visible_nodes_extended.size()) {

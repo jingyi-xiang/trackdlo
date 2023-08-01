@@ -412,8 +412,8 @@ MatrixXd post_processing (MatrixXd Y_0, MatrixXd Y, double check_distance, doubl
             // vars can be seen as a flattened array of size len(Y)*3
             model.addConstr((((r_i*vars[3*i] + (1 - r_i)*vars[3*(i+1)]) - (r_j*vars[3*j] + (1 - r_j)*vars[3*(j+1)])) * (pA(0, 0) - pB(0, 0)) +
                              ((r_i*vars[3*i+1] + (1 - r_i)*vars[3*(i+1)+1]) - (r_j*vars[3*j+1] + (1 - r_j)*vars[3*(j+1)+1])) * (pA(0, 1) - pB(0, 1)) +
-                             ((r_i*vars[3*i+2] + (1 - r_i)*vars[3*(i+1)+2]) - (r_j*vars[3*j+2] + (1 - r_j)*vars[3*(j+1)+2])) * (pA(0, 2) - pB(0, 2))) / (pA - pB).norm()
-                            >= dlo_diameter);
+                             ((r_i*vars[3*i+2] + (1 - r_i)*vars[3*(i+1)+2]) - (r_j*vars[3*j+2] + (1 - r_j)*vars[3*(j+1)+2])) * (pA(0, 2) - pB(0, 2)))
+                            >= dlo_diameter*(pA - pB).norm());
         }
     }
 

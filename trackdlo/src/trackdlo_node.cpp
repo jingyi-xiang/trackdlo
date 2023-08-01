@@ -231,6 +231,10 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
                     double fy = proj_matrix(1, 1);
                     double pc_z = cur_depth.at<uint16_t>(i, j) / 1000.0;
 
+                    // if (pc_z < 0.52) {
+                    //     continue;
+                    // }
+
                     point.x = (pixel_x - cx) * pc_z / fx;
                     point.y = (pixel_y - cy) * pc_z / fy;
                     point.z = pc_z;
@@ -294,7 +298,7 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
                     // this is necessary because exp(-dist/sigma2) can become too small to represent in MatrixXd
                     // if a point x_n in X is too far away from all nodes, all entries in row n of P will be zero,
                     // even if they technically aren't all zeros
-                    if (shortest_pt_node_dists[n] < 0.1) {
+                    if (shortest_pt_node_dists[n] < 0.05) {
                         X_temp.row(valid_pt_counter) = X.row(n);
                         valid_pt_counter += 1;
                     }
@@ -378,7 +382,7 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
         }
 
         std::vector<int> visible_nodes_extended = {};
-        if (visible_nodes.size() < Y.rows()/2) {
+        if (visible_nodes.size() < Y.rows()/3) {
             visible_nodes = {};
             visible_nodes = last_valid_visible_nodes;
             visible_nodes_extended = last_valid_visible_nodes;
@@ -454,8 +458,8 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
         Mat tracking_img;
         tracking_img = 0.5*cur_image_orig + 0.5*cur_image;
 
-        // std::vector<int> vis = visible_nodes;
-        std::vector<int> vis = not_self_occluded_nodes;
+        std::vector<int> vis = visible_nodes;
+        // std::vector<int> vis = not_self_occluded_nodes;
 
         // draw points
         for (int idx : indices_vec) {
@@ -509,7 +513,7 @@ sensor_msgs::ImagePtr Callback(const sensor_msgs::ImageConstPtr& image_msg, cons
         tracking_img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", tracking_img).toImageMsg();
 
         // publish the results as a marker array
-        visualization_msgs::MarkerArray results = MatrixXd2MarkerArray(Y, result_frame_id, "node_results", {1.0, 150.0/255.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0}, 0.01, 0.005, not_self_occluded_nodes, {1.0, 0.0, 0.0, 1.0}, {1.0, 0.0, 0.0, 1.0});
+        visualization_msgs::MarkerArray results = MatrixXd2MarkerArray(Y, result_frame_id, "node_results", {1.0, 150.0/255.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0}, 0.01, 0.005, vis, {1.0, 0.0, 0.0, 1.0}, {1.0, 0.0, 0.0, 1.0});
         // visualization_msgs::MarkerArray results = MatrixXd2MarkerArray(Y, result_frame_id, "node_results", {1.0, 150.0/255.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0}, 0.01, 0.005);
         visualization_msgs::MarkerArray guide_nodes_results = MatrixXd2MarkerArray(guide_nodes, result_frame_id, "guide_node_results", {0.0, 0.0, 0.0, 0.5}, {0.0, 0.0, 1.0, 0.5});
         visualization_msgs::MarkerArray corr_priors_results = MatrixXd2MarkerArray(priors, result_frame_id, "corr_prior_results", {0.0, 0.0, 0.0, 0.5}, {1.0, 0.0, 0.0, 0.5});

@@ -31,9 +31,9 @@
         <param name="hsv_threshold_upper_limit" type="string" value="$(arg hsv_threshold_upper_limit)" />
         <param name="hsv_threshold_lower_limit" type="string" value="$(arg hsv_threshold_lower_limit)" />
 
-        <param name="use_post_processing" type="bool" value="false" />
+        <param name="use_post_processing" type="bool" value="true" />
         <param name="dlo_diameter" value="0.01" />
-        <param name="check_distance" value="0.02" />
+        <param name="check_distance" value="0.015" />
         <param name="clamp" type="bool" value="true" />
 
         <!-- beta and lambda: MCT weights. the larger they are, the more rigid the object becomes -->
@@ -65,7 +65,7 @@
         <param name="tol" value="0.0002" />
 
         <!-- k_vis: the strength of visibility information's effect on membership probability computation -->
-        <param name="k_vis" value="100" />
+        <param name="k_vis" value="50" />
 
         <!-- set to false in the registration step because we did not have space in the paper to discuss LLE -->
         <param name="include_lle" value="false" />
@@ -82,7 +82,7 @@
         <param name="downsample_leaf_size" value="0.008" />
         <param name="multi_color_dlo" type="bool" value="$(arg multi_color_dlo)" />
         <param name="visibility_threshold" type="double" value="0.01" />
-        <param name="dlo_pixel_width" value="30" />
+        <param name="dlo_pixel_width" value="40" />
         <param name="gltp" type="bool" value="$(arg gltp)" />
     </node>
 

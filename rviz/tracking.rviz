@@ -51,7 +51,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /trackdlo/results_img
+      Image Topic: /camera/color/image_raw
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -63,7 +63,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /camera/color/image_raw
+      Image Topic: /trackdlo/results_img
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -289,7 +289,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.46876779198646545
+      Distance: 0.4244806170463562
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -297,17 +297,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.5357120633125305
-        Y: 0.0800638198852539
-        Z: -0.021995484828948975
+        X: 0.5242747664451599
+        Y: -0.000800337758846581
+        Z: -0.02036379463970661
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5097972750663757
+      Pitch: 0.48979681730270386
       Target Frame: <Fixed Frame>
-      Yaw: 3.0008602142333984
+      Yaw: 2.6558563709259033
     Saved: ~
 Window Geometry:
   Displays:
